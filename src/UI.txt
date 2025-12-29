@@ -1,0 +1,21 @@
+┌──────────────────────────────┐
+│        INSERT CARD           │
+│                              │
+│ Card Number: [              ]│
+│ PIN:         [              ]│
+│                              │
+│ Press ENTER to continue      │
+└──────────────────────────────┘
+
+┌──────────────────────────────┐
+│           ATM MENU           │
+│                              │
+│ [WITHDRAW]      DEPOSIT      │
+│  TRANSFER   [BALANCE ENQUIRY]│
+│    EXIT        CHANGE PIN    │
+│                              │
+│ Use arrow keys to navigate,  │
+│ ENTER to select              │
+└──────────────────────────────┘
+
+1234123412341234

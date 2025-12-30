@@ -41,6 +41,7 @@ A console-based ATM application written in C++17 using object-oriented design pr
     ├── TextBuffer.hpp
     ├── TextField.cpp
     └── TextField.hpp
+```
 
 ## Build
 ```bash
@@ -49,3 +50,4 @@ cd build
 cmake ..
 cmake --build .
 ./atm
+```

@@ -1,7 +1,8 @@
-#include "Transaction.hpp"
 #include <sstream>
 #include <ctime>
 #include <stdexcept>
+
+#include "Transaction.hpp"
 
 std::uint64_t Transaction::nextID = 1;
 

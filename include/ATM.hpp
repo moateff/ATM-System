@@ -2,6 +2,9 @@
 
 #include <cstdint>
 #include <vector>
+#include <string>
+#include <memory>
+
 #include "Bank.hpp"
 #include "Transaction.hpp"
 #include "Card.hpp"

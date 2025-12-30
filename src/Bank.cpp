@@ -1,5 +1,6 @@
-#include "Bank.hpp"
 #include <stdexcept>
+
+#include "Bank.hpp"
 
 Bank::Bank(const std::string& name) : bankName(name) {
     if (name.empty())

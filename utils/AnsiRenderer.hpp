@@ -11,5 +11,6 @@ public:
     static void drawText(int x, int y, const std::string& text);
     static void hideCursor();
     static void showCursor();
+    static void flush();
 };
 

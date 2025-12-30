@@ -1,10 +1,9 @@
-#include "Card.hpp"
-
 #include <chrono>
 #include <functional>
 #include <sstream>
 #include <iomanip>
 
+#include "Card.hpp"
 
 std::string Card::hashPIN(const std::string& pin) {
     std::hash<std::string> hasher;

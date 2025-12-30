@@ -1,6 +1,7 @@
-#include "Account.hpp"
 #include <sstream>
 #include <stdexcept>
+
+#include "Account.hpp"
 
 std::uint64_t Account::nextID = 1;
 

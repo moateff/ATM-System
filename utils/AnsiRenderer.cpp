@@ -14,7 +14,7 @@ void AnsiRenderer::invertOn() {
 }
 
 void AnsiRenderer::invertOff() {
-    std::cout << "\033[0m";
+    std::cout << "\033[27m";
 }
 
 void AnsiRenderer::drawText(int x, int y, const std::string& t) {
@@ -31,9 +31,13 @@ void AnsiRenderer::drawBox(int x, int y, int w, int h) {
 }
 
 void AnsiRenderer::hideCursor() {
-    std::cout << "\033[?25l"; 
+    std::cout << "\033[?25l";
 }
 
 void AnsiRenderer::showCursor() {
-    std::cout << "\033[?25h"; 
+    std::cout << "\033[?25h";
+}
+
+void AnsiRenderer::flush() {
+    std::cout << std::flush;
 }

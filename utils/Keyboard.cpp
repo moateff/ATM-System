@@ -1,13 +1,13 @@
 #include "Keyboard.hpp"
 #include <unistd.h>
 
-int LinuxKeyboard::readKeyRaw() {
+int Keyboard::readKeyRaw() {
     char c = 0;
     read(STDIN_FILENO, &c, 1);
     return c;
 }
 
-int LinuxKeyboard::readKey() {
+int Keyboard::readKey() {
 
     int c = readKeyRaw();
 
@@ -35,13 +35,13 @@ int LinuxKeyboard::readKey() {
     return c;
 }
 
-LinuxKeyboard::LinuxKeyboard() {
+Keyboard::Keyboard() {
     tcgetattr(STDIN_FILENO, &oldTerm);
     termios raw = oldTerm;
     raw.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSANOW, &raw);
 }
 
-LinuxKeyboard::~LinuxKeyboard() {
+Keyboard::~Keyboard() {
     tcsetattr(STDIN_FILENO, TCSANOW, &oldTerm);
 }

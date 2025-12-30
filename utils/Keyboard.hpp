@@ -16,15 +16,9 @@ constexpr int KEY_DELETE      = 1006;
 
 class Keyboard {
 public:
-    virtual ~Keyboard() = default;
-    virtual int readKey() = 0;
-};
-
-class LinuxKeyboard : public Keyboard {
-public:
-    LinuxKeyboard();
-    ~LinuxKeyboard();
-    int readKey() override;
+    Keyboard();
+    ~Keyboard();
+    int readKey();
 
 private:
     termios oldTerm{};

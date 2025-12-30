@@ -1,8 +1,9 @@
-#include "ATM.hpp"
-#include "Card.hpp"
-#include "Bank.hpp"
 #include <stdexcept>
 #include <iostream>
+
+#include "Card.hpp"
+#include "Bank.hpp"
+#include "ATM.hpp"
 
 std::uint64_t ATM::nextID = 1;
 
@@ -10,8 +11,9 @@ ATM::ATM(Bank& bank,
         const std::string& location, 
         double initialCash)
     : atmID(nextID++), 
-      bank(bank), location(location), 
-      availableCash(initialCash) {
+      location(location), 
+      availableCash(initialCash), 
+      bank(bank) {
     if (initialCash < 0)
         throw std::invalid_argument("Initial ATM cash cannot be negative");
 }

@@ -9,18 +9,24 @@ class TextField {
 public:
     using Validator = std::function<bool(char)>;
 
-    TextField(int x, int y, size_t width,
-              Keyboard& kb,
+    TextField(int x, int y, 
+              int width, int capacity,
               Validator v,
               bool masked = false);
 
-    std::string read();
+    std::string read(Keyboard& kb);
+    
+    int getX() const;
+    int getY() const;
+    int getWidth() const;
+    int getCapacity() const;
 
 private:
     int x, y;
-    size_t width;
+    int width, capacity;
     bool masked;
-    Keyboard& keyboard;
     TextBuffer buffer;
     Validator validate;
+
+    void redraw();
 };

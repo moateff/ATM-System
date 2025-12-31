@@ -22,7 +22,9 @@ Card::Card(const std::string& cardNumber,
       bankName(bankName),
       pinHash(hashPIN(pin)),
       accountID(accountID),
-      status(Status::ACTIVE) { }
+      status(Status::ACTIVE) { 
+    if (isExpired()) status = Status::EXPIRED;
+}
 
 uint64_t Card::getAccountID() const {
     return accountID;
@@ -87,6 +89,18 @@ std::string Card::getMaskedCardNumber() const {
     std::string masked = "************";
     masked += std::string(cardNumber.data() + 12, cardNumber.size() - 12);
     return masked;
+}
+
+Card::Status Card::getStatus() const {
+    return status;
+}
+
+void Card::blockCard() {
+    status = Status::BLOCKED;
+}
+
+void Card::unblockCard() {
+    status = isExpired() ? Status::EXPIRED : Status::ACTIVE;
 }
 
 std::string Card::toString() const {

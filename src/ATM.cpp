@@ -24,16 +24,16 @@ std::shared_ptr<Card> ATM::authenticateCard(const std::string& cardNumber, const
 
             if (card->getCardNumber() != cardNumber)
                 continue;
-
+            /*
             if (card->isExpired())
                 return nullptr;
 
             if (card->isBlocked())
                 return nullptr;
-
+            */
             if (!card->checkPIN(pin))
                 return nullptr;
-
+            
             return card;  // authenticated
         }
     }

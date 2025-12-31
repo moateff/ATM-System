@@ -63,10 +63,14 @@ public:
     const year_month& getExpirationDate() const;
     Status getState() const;
     const std::string& getCardNumber() const;
-    
+    Status getStatus() const;
+
     bool isExpired() const;
     bool isActive() const;
     bool isBlocked() const;
+    
+    void blockCard();
+    void unblockCard();
     
     bool validateCard() const;
     bool checkPIN(const std::string& pin) const;

@@ -37,14 +37,34 @@ void UI::run() {
 // Pages 
 void UI::insertCardPage() {
     auto values = insertCardForm();
-    if (values.size() < 2) { currentPage = ATMPage::Exit; return; }
+    if (values.size() < 2) { 
+        currentPage = ATMPage::InsertCard; 
+        return; 
+    }
 
     currentCard = atm->authenticateCard(values[0], values[1]);
+
     if (!currentCard) {
-        showMessage("INVALID CARD");
+        showMessage("INVALID CARD NUMBER OR PIN", RED);
         currentPage = ATMPage::InsertCard;
-    } else {
-        currentPage = ATMPage::MainMenu;
+        return; 
+    } 
+
+    auto status = currentCard->getStatus();
+
+    switch(status) {
+        case Card::Status::EXPIRED: 
+            showMessage("CARD EXPIRED", YELLOW);
+            currentPage = ATMPage::InsertCard; 
+            break;
+        case Card::Status::BLOCKED: 
+            showMessage("CARD BLOCKED", RED);
+            currentPage = ATMPage::InsertCard;
+            break;
+        case Card::Status::ACTIVE: 
+            showMessage("ACCESS GRANTED");
+            currentPage = ATMPage::MainMenu; 
+            break;
     }
 }
 
@@ -69,17 +89,22 @@ void UI::mainMenuPage() {
 
 void UI::withdrawPage() {
     auto values = withdrawForm();
-    if (values.empty()) { currentPage = ATMPage::MainMenu; return; }
+
+    if (values[0].empty()) { 
+        showMessage("INVALID AMOUNT", RED);
+        currentPage = ATMPage::MainMenu; 
+        return; 
+    }
 
     double amount = std::stod(values[0]);
     auto status = atm->withdrawCash(*currentCard, amount);
 
     switch(status) {
-        case ATM::WithdrawStatus::SUCCESS: showMessage("WITHDRAWAL SUCCESS", false); break;
-        case ATM::WithdrawStatus::INSUFFICIENT_ACCOUNT_BALANCE: showMessage("INSUFFICIENT BALANCE"); break;
-        case ATM::WithdrawStatus::INSUFFICIENT_ATM_CASH: showMessage("ATM OUT OF CASH"); break;
-        case ATM::WithdrawStatus::INVALID_AMOUNT: showMessage("INVALID AMOUNT"); break;
-        case ATM::WithdrawStatus::INVALID_CARD: showMessage("INVALID CARD"); break;
+        case ATM::WithdrawStatus::SUCCESS: showMessage("WITHDRAWAL SUCCESS"); break;
+        case ATM::WithdrawStatus::INSUFFICIENT_ACCOUNT_BALANCE: showMessage("INSUFFICIENT BALANCE", RED); break;
+        case ATM::WithdrawStatus::INSUFFICIENT_ATM_CASH: showMessage("ATM OUT OF CASH", RED); break;
+        case ATM::WithdrawStatus::INVALID_AMOUNT: showMessage("INVALID AMOUNT", RED); break;
+        case ATM::WithdrawStatus::INVALID_CARD: showMessage("INVALID CARD", RED); break;
     }
 
     currentPage = ATMPage::MainMenu;
@@ -87,15 +112,20 @@ void UI::withdrawPage() {
 
 void UI::depositPage() {
     auto values = depositForm();
-    if (values.empty()) { currentPage = ATMPage::MainMenu; return; }
+    
+    if (values[0].empty()) { 
+        showMessage("INVALID AMOUNT", RED);
+        currentPage = ATMPage::MainMenu; 
+        return; 
+    }
 
     double amount = std::stod(values[0]);
     auto status = atm->depositCash(*currentCard, amount);
 
     switch(status) {
-        case ATM::DepositStatus::SUCCESS: showMessage("DEPOSIT SUCCESS", false); break;
-        case ATM::DepositStatus::INVALID_AMOUNT: showMessage("INVALID AMOUNT"); break;
-        case ATM::DepositStatus::INVALID_CARD: showMessage("INVALID CARD"); break;
+        case ATM::DepositStatus::SUCCESS: showMessage("DEPOSIT SUCCESS"); break;
+        case ATM::DepositStatus::INVALID_AMOUNT: showMessage("INVALID AMOUNT", RED); break;
+        case ATM::DepositStatus::INVALID_CARD: showMessage("INVALID CARD", RED); break;
     }
 
     currentPage = ATMPage::MainMenu;
@@ -103,7 +133,18 @@ void UI::depositPage() {
 
 void UI::transferPage() {
     auto values = transferForm();
-    if (values.empty()) { currentPage = ATMPage::MainMenu; return; }
+
+    if (values[0].empty()) { 
+        showMessage("INVALID TARGET ACCOUNT", RED);
+        currentPage = ATMPage::MainMenu; 
+        return; 
+    }
+
+    if (values[1].empty()) { 
+        showMessage("INVALID AMOUNT", RED);
+        currentPage = ATMPage::MainMenu; 
+        return; 
+    }
 
     std::uint64_t targetAccount = std::stoull(values[0]);
     double amount = std::stod(values[1]);
@@ -111,13 +152,13 @@ void UI::transferPage() {
     auto status = atm->transfer(*currentCard, targetAccount, amount);
 
     switch(status) {
-        case ATM::TransferStatus::SUCCESS: showMessage("TRANSFER SUCCESS", false); break;
-        case ATM::TransferStatus::INVALID_AMOUNT: showMessage("INVALID AMOUNT"); break;
-        case ATM::TransferStatus::INVALID_CARD: showMessage("INVALID CARD"); break;
-        case ATM::TransferStatus::SAME_ACCOUNT: showMessage("CANNOT TRANSFER TO SAME ACCOUNT"); break;
-        case ATM::TransferStatus::SOURCE_ACCOUNT_NOT_FOUND: showMessage("SOURCE ACCOUNT NOT FOUND"); break;
-        case ATM::TransferStatus::TARGET_ACCOUNT_NOT_FOUND: showMessage("TARGET ACCOUNT NOT FOUND"); break;
-        case ATM::TransferStatus::INSUFFICIENT_BALANCE: showMessage("INSUFFICIENT BALANCE"); break;
+        case ATM::TransferStatus::SUCCESS: showMessage("TRANSFER SUCCESS"); break;
+        case ATM::TransferStatus::INVALID_AMOUNT: showMessage("INVALID AMOUNT", RED); break;
+        case ATM::TransferStatus::INVALID_CARD: showMessage("INVALID CARD", RED); break;
+        case ATM::TransferStatus::SAME_ACCOUNT: showMessage("CANNOT TRANSFER TO SAME ACCOUNT", YELLOW); break;
+        case ATM::TransferStatus::SOURCE_ACCOUNT_NOT_FOUND: showMessage("SOURCE ACCOUNT NOT FOUND", RED); break;
+        case ATM::TransferStatus::TARGET_ACCOUNT_NOT_FOUND: showMessage("TARGET ACCOUNT NOT FOUND", RED); break;
+        case ATM::TransferStatus::INSUFFICIENT_BALANCE: showMessage("INSUFFICIENT BALANCE", RED); break;
     }
 
     currentPage = ATMPage::MainMenu;
@@ -125,7 +166,18 @@ void UI::transferPage() {
 
 void UI::changePinPage() {
     auto values = changePinForm();
-    if (values.empty()) { currentPage = ATMPage::MainMenu; return; }
+
+    if (values[0].empty()) { 
+        showMessage("INVALID OLD PIN", YELLOW);
+        currentPage = ATMPage::MainMenu; 
+        return; 
+    }
+
+    if (values[1].empty()) { 
+        showMessage("INVALID NEW PIN", RED);
+        currentPage = ATMPage::MainMenu; 
+        return; 
+    }
 
     std::string oldPin = values[0];
     std::string newPin = values[1];
@@ -133,11 +185,11 @@ void UI::changePinPage() {
     auto status = atm->changePIN(*currentCard, oldPin, newPin);
 
     switch(status) {
-        case ATM::ChangePinStatus::SUCCESS: showMessage("PIN CHANGED", false); break;
-        case ATM::ChangePinStatus::INVALID_CARD: showMessage("INVALID CARD"); break;
-        case ATM::ChangePinStatus::INVALID_OLD_PIN: showMessage("INVALID OLD PIN"); break;
-        case ATM::ChangePinStatus::CARD_BLOCKED: showMessage("CARD BLOCKED"); break;
-        case ATM::ChangePinStatus::CARD_EXPIRED: showMessage("CARD EXPIRED"); break;
+        case ATM::ChangePinStatus::SUCCESS: showMessage("PIN CHANGED"); break;
+        case ATM::ChangePinStatus::INVALID_CARD: showMessage("INVALID CARD", RED); break;
+        case ATM::ChangePinStatus::INVALID_OLD_PIN: showMessage("INVALID OLD PIN", RED); break;
+        case ATM::ChangePinStatus::CARD_BLOCKED: showMessage("CARD BLOCKED", RED); break;
+        case ATM::ChangePinStatus::CARD_EXPIRED: showMessage("CARD EXPIRED", YELLOW); break;
     }
 
     currentPage = ATMPage::MainMenu;
@@ -174,12 +226,13 @@ void UI::balancePage() {
 }
 
 // Utils
-void UI::showMessage(const std::string& message, bool isError, int durationSeconds) {
+void UI::showMessage(const std::string& message, int color, int durationSeconds) {
     AnsiRenderer::clear();
     AnsiRenderer::hideCursor();
 
-    if (isError) std::cout << "\033[41;97m"; // red background
-    else         std::cout << "\033[42;97m"; // green background
+    if (color == RED)         std::cout << "\033[41;97m"; // red background
+    else if (color == YELLOW) std::cout << "\033[30;103m"; // yellow background
+    else                      std::cout << "\033[42;97m"; // green background
 
     int w = 40, h = 12, x = 10, y = 3;
     AnsiRenderer::drawBox(x, y, w, h);

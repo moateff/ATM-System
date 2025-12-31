@@ -43,7 +43,7 @@ A console-based ATM application written in C++17 using object-oriented design pr
     └── TextField.hpp
 ```
 
-## Build
+## Project build 
 ```bash
 mkdir build
 cd build

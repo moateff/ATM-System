@@ -33,6 +33,7 @@ private:
     std::shared_ptr<Card> currentCard;
     ATMPage currentPage;
     Keyboard keyboard;
+    int invalidPINcounter = 0;
 
     // Pages
     void insertCardPage();
@@ -45,7 +46,7 @@ private:
 
     // Utility
     void showMessage(const std::string& message, 
-        int color = GREEN, int durationSeconds = 2);
+        int color = GREEN, int durationSeconds = 1);
 
     // Forms
     std::vector<std::string> insertCardForm();

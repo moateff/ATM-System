@@ -53,6 +53,15 @@ public:
         CARD_EXPIRED
     };
 
+    enum class AuthenticateStatus {
+        SUCCESS,
+        INVALID_CARD,
+        CARD_BLOCKED,
+        CARD_EXPIRED,
+        INVALID_PIN,
+        CARD_NOT_FOUND
+    };
+
 private:
     static std::uint64_t nextID;
 
@@ -68,7 +77,8 @@ public:
         const std::string& location, 
         double initialCash = 0.0);
 
-    std::shared_ptr<Card> authenticateCard(const std::string& cardNumber, const std::string& pin);
+    AuthenticateStatus authenticateCard(const std::string& cardNumber, 
+        const std::string& pin, std::shared_ptr<Card>& authenticatedCard) const;
     VerifyStatus verifyCard(const Card& card) const;
     WithdrawStatus withdrawCash(const Card& card, double amount);
     DepositStatus depositCash(const Card& card, double amount);

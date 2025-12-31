@@ -37,33 +37,63 @@ void UI::run() {
 // Pages 
 void UI::insertCardPage() {
     auto values = insertCardForm();
-    if (values.size() < 2) { 
-        currentPage = ATMPage::InsertCard; 
+
+    // Ensure both card number and PIN are entered
+    if (values.size() != 2) { 
+        currentPage = ATMPage::InsertCard;
         return; 
     }
 
-    currentCard = atm->authenticateCard(values[0], values[1]);
-
-    if (!currentCard) {
-        showMessage("INVALID CARD NUMBER OR PIN", RED);
+    if (values[0].empty() || values[1].empty()) { 
         currentPage = ATMPage::InsertCard;
         return; 
-    } 
+    }
 
-    auto status = currentCard->getStatus();
+    // Authenticate card
+    std::shared_ptr<Card> cardPtr;
+    auto status = atm->authenticateCard(values[0], values[1], cardPtr);
 
-    switch(status) {
-        case Card::Status::EXPIRED: 
-            showMessage("CARD EXPIRED", YELLOW);
-            currentPage = ATMPage::InsertCard; 
+    // Handle authentication status
+    switch (status) {
+        case ATM::AuthenticateStatus::SUCCESS:
+            currentCard = cardPtr;
+            showMessage("ACCESS GRANTED");
+            currentPage = ATMPage::MainMenu;
             break;
-        case Card::Status::BLOCKED: 
+
+        case ATM::AuthenticateStatus::CARD_EXPIRED:
+            showMessage("CARD EXPIRED", YELLOW);
+            currentPage = ATMPage::InsertCard;
+            break;
+
+        case ATM::AuthenticateStatus::CARD_BLOCKED:
             showMessage("CARD BLOCKED", RED);
             currentPage = ATMPage::InsertCard;
             break;
-        case Card::Status::ACTIVE: 
-            showMessage("ACCESS GRANTED");
-            currentPage = ATMPage::MainMenu; 
+
+        case ATM::AuthenticateStatus::INVALID_PIN:
+            /*
+            if (invalidPINcounter >= 3) {
+                showMessage("CARD BLOCKED TEMPORARILY", RED);
+                currentCard->blockCard();
+            } else if (invalidPINcounter == 2) {
+                showMessage("INVALID PIN " + std::to_string(invalidPINcounter) + " TIMES", YELLOW);
+            } else {
+                showMessage("INVALID PIN " + std::to_string(invalidPINcounter) + " TIMES", YELLOW);
+            }
+            */
+            showMessage("INVALID PIN", RED);
+            currentPage = ATMPage::InsertCard;
+            break;
+
+        case ATM::AuthenticateStatus::CARD_NOT_FOUND:
+            showMessage("CARD NOT FOUND", RED);
+            currentPage = ATMPage::InsertCard;
+            break;
+
+        case ATM::AuthenticateStatus::INVALID_CARD:
+            showMessage("INVALID CARD", RED);
+            currentPage = ATMPage::InsertCard;
             break;
     }
 }
@@ -90,9 +120,14 @@ void UI::mainMenuPage() {
 void UI::withdrawPage() {
     auto values = withdrawForm();
 
-    if (values[0].empty()) { 
-        showMessage("INVALID AMOUNT", RED);
+    if (values.size() != 1) { 
         currentPage = ATMPage::MainMenu; 
+        return; 
+    }
+
+    if (values[0].empty()) { 
+        showMessage("ENTER AMOUNT", YELLOW);
+        currentPage = ATMPage::Withdraw; 
         return; 
     }
 
@@ -113,9 +148,14 @@ void UI::withdrawPage() {
 void UI::depositPage() {
     auto values = depositForm();
     
-    if (values[0].empty()) { 
-        showMessage("INVALID AMOUNT", RED);
+    if (values.size() != 1) { 
         currentPage = ATMPage::MainMenu; 
+        return; 
+    }
+
+    if (values[0].empty()) { 
+        showMessage("ENTER AMOUNT", YELLOW);
+        currentPage = ATMPage::Deposit; 
         return; 
     }
 
@@ -134,15 +174,20 @@ void UI::depositPage() {
 void UI::transferPage() {
     auto values = transferForm();
 
-    if (values[0].empty()) { 
-        showMessage("INVALID TARGET ACCOUNT", RED);
+    if (values.size() != 2) { 
         currentPage = ATMPage::MainMenu; 
         return; 
     }
 
+    if (values[0].empty()) { 
+        showMessage("ENTER TARGET ACCOUNT", YELLOW);
+        currentPage = ATMPage::Transfer; 
+        return; 
+    }
+
     if (values[1].empty()) { 
-        showMessage("INVALID AMOUNT", RED);
-        currentPage = ATMPage::MainMenu; 
+        showMessage("ENTER AMOUNT", YELLOW);
+        currentPage = ATMPage::Transfer; 
         return; 
     }
 
@@ -167,15 +212,20 @@ void UI::transferPage() {
 void UI::changePinPage() {
     auto values = changePinForm();
 
-    if (values[0].empty()) { 
-        showMessage("INVALID OLD PIN", YELLOW);
+    if (values.size() != 2) { 
         currentPage = ATMPage::MainMenu; 
         return; 
     }
 
+    if (values[0].empty()) { 
+        showMessage("ENTER OLD PIN", YELLOW);
+        currentPage = ATMPage::ChangePIN; 
+        return; 
+    }
+
     if (values[1].empty()) { 
-        showMessage("INVALID NEW PIN", RED);
-        currentPage = ATMPage::MainMenu; 
+        showMessage("ENTER NEW PIN", YELLOW);
+        currentPage = ATMPage::ChangePIN; 
         return; 
     }
 

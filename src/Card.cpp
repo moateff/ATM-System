@@ -21,9 +21,9 @@ Card::Card(const std::string& cardNumber,
       cardHolderName(cardHolderName),
       bankName(bankName),
       pinHash(hashPIN(pin)),
-      accountID(accountID),
-      status(Status::ACTIVE) { 
-    if (isExpired()) status = Status::EXPIRED;
+      accountID(accountID) {
+    
+    status = isExpired() ? Status::EXPIRED : Status::ACTIVE;
 }
 
 uint64_t Card::getAccountID() const {
@@ -43,8 +43,7 @@ const std::string& Card::getCardNumber() const {
 }
 
 bool Card::validateCard() const {
-    return true;
-    // should validate card data like card number, card holder name
+    return cardNumber.size() == 3 && cardHolderName.size() > 0 && bankName.size() > 0; // && pinHash.size() == 4;
 }
 
 bool Card::isExpired() const {
@@ -112,7 +111,7 @@ std::string Card::toString() const {
     oss << "Card Number : " << getMaskedCardNumber() << '\n';
     oss << "Expiration  : " << expirationDate.toString() << '\n';
     oss << "Account ID  : " << accountID << '\n';
-    oss << "Status      : " << (status == Status::BLOCKED ? "Blocked" : "Active") << '\n';
+    oss << "Status      : " << (isExpired() ? "Expired" : isBlocked() ? "Blocked" : "Active") << '\n';
 
     return oss.str();
 }

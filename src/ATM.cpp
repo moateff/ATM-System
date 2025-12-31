@@ -18,27 +18,33 @@ ATM::ATM(Bank& bank,
         throw std::invalid_argument("Initial ATM cash cannot be negative");
 }
 
-std::shared_ptr<Card> ATM::authenticateCard(const std::string& cardNumber, const std::string& pin) {
+ATM::AuthenticateStatus ATM::authenticateCard(
+    const std::string& cardNumber,
+    const std::string& pin,
+    std::shared_ptr<Card>& authenticatedCard) const
+{
     for (const auto& account : bank.getAccounts()) {
         for (const auto& card : account->getCards()) {
-
             if (card->getCardNumber() != cardNumber)
                 continue;
-            /*
-            if (card->isExpired())
-                return nullptr;
 
-            if (card->isBlocked())
-                return nullptr;
-            */
+            if (!card->validateCard())
+                return AuthenticateStatus::INVALID_CARD;
+
             if (!card->checkPIN(pin))
-                return nullptr;
-            
-            return card;  // authenticated
+                return AuthenticateStatus::INVALID_PIN;
+            if (card->isExpired())
+                return AuthenticateStatus::CARD_EXPIRED;
+            if (card->isBlocked())
+                return AuthenticateStatus::CARD_BLOCKED;
+
+            authenticatedCard = card;
+            return AuthenticateStatus::SUCCESS;
         }
     }
 
-    return nullptr; // card not found
+    authenticatedCard = nullptr;
+    return AuthenticateStatus::CARD_NOT_FOUND;
 }
 
 ATM::VerifyStatus ATM::verifyCard(const Card& card) const {

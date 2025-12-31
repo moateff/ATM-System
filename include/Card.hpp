@@ -46,7 +46,7 @@ private:
     std::string bankName;
     std::string pinHash;
     const std::uint64_t accountID;
-    Status status{Status::ACTIVE};
+    Status status;
 
     static std::string hashPIN(const std::string& pin);
     std::string getMaskedCardNumber() const;
@@ -71,7 +71,7 @@ public:
     
     void blockCard();
     void unblockCard();
-    
+
     bool validateCard() const;
     bool checkPIN(const std::string& pin) const;
     bool updatePIN(const std::string& oldPin, const std::string& newPin);

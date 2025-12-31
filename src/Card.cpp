@@ -34,8 +34,12 @@ const Card::year_month& Card::getExpirationDate() const {
     return expirationDate;
 }
 
-Card::Status Card::getState() const {
-    return status;
+const std::string& Card::getCardHolderName() const {
+    return cardHolderName;
+}
+
+const std::string& Card::getBankName() const {
+    return bankName;
 }
 
 const std::string& Card::getCardNumber() const {

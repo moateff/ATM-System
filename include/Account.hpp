@@ -27,6 +27,8 @@ public:
             double initialBalance = 0.0);
 
     uint64_t getAccountID() const;
+    std::string getAccountHolderName() const;
+    std::string getAccountNumber() const;
     double getBalance() const;
 
     bool withdraw(double amount);

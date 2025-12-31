@@ -27,6 +27,14 @@ uint64_t Account::getAccountID() const {
     return accountID;
 }
 
+std::string Account::getAccountHolderName() const {
+    return accountHolderName;
+}
+
+std::string Account::getAccountNumber() const {
+    return accountNumber;
+}
+
 double Account::getBalance() const {
     return balance;
 }

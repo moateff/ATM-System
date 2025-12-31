@@ -9,12 +9,12 @@ std::uint64_t Transaction::nextID = 1;
 Transaction::Transaction(std::uint64_t accountID,
                          Type type,
                          double amount,
-                         Status state)
+                         Status status)
     : transactionID(nextID++),
       accountID(accountID),
       timestamp(std::chrono::system_clock::now()),
       type(type),
-      state(state),
+      status(status),
       amount(amount)
 {
     if (amount < 0.0) {
@@ -43,7 +43,7 @@ double Transaction::getAmount() const {
 }
 
 Transaction::Status Transaction::getStatus() const {
-    return state;
+    return status;
 }
 
 std::chrono::system_clock::time_point Transaction::getTimestamp() const {
@@ -65,7 +65,7 @@ std::string Transaction::toString() const {
     }
     oss << "Amount        : " << amount << "\n";
     oss << "Status        : ";
-    switch (state) {
+    switch (status) {
         case Status::SUCCESS: oss << "Success" << "\n"; break;
         case Status::FAILED: oss << "Failed" << "\n"; break;
     }

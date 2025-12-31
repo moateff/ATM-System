@@ -7,10 +7,6 @@
 #include "Card.hpp"
 #include "Keyboard.hpp"
 
-#define RED    0
-#define GREEN  1 
-#define YELLOW 2
-
 enum class ATMPage {
     InsertCard,
     MainMenu,
@@ -28,7 +24,19 @@ public:
 
     void run();
 
+    enum class Color {
+        BLACK  = 0,
+        RED    = 4,
+        GREEN  = 2,
+        YELLOW = 6,
+        WHITE  = 7
+    };
+
 private:
+    // Screen
+    int x = 10, y = 3;
+    int width = 40, height = 12;
+
     std::shared_ptr<ATM> atm;
     std::shared_ptr<Card> currentCard;
     ATMPage currentPage;
@@ -46,7 +54,8 @@ private:
 
     // Utility
     void showMessage(const std::string& message, 
-        int color = GREEN, int durationSeconds = 1);
+                    Color color = Color::GREEN, 
+                    int durationSeconds = 1);
 
     // Forms
     std::vector<std::string> insertCardForm();

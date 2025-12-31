@@ -18,6 +18,10 @@ ATM::ATM(Bank& bank,
         throw std::invalid_argument("Initial ATM cash cannot be negative");
 }
 
+bool ATM::validateCardNumber(std::string cardNumber) {
+    return cardNumber.size() == 3;
+}
+
 ATM::AuthenticateStatus ATM::authenticateCard(
     const std::string& cardNumber,
     const std::string& pin,
@@ -57,13 +61,13 @@ ATM::VerifyStatus ATM::verifyCard(const Card& card) const {
     if (card.isExpired())
         return VerifyStatus::CARD_EXPIRED;
 
-    return VerifyStatus::OK;
+    return VerifyStatus::SUCCESS;
 }
 
 ATM::ChangePinStatus ATM::changePIN(Card& card, const std::string& oldPin, const std::string& newPin) {
     // Step 1: Verify card status
     auto verifyStatus = verifyCard(card);
-    if (verifyStatus != VerifyStatus::OK) {
+    if (verifyStatus != VerifyStatus::SUCCESS) {
         switch (verifyStatus) {
             case VerifyStatus::CARD_BLOCKED:
                 return ChangePinStatus::CARD_BLOCKED;
@@ -98,7 +102,7 @@ ATM::ChangePinStatus ATM::changePIN(Card& card, const std::string& oldPin, const
 
 double ATM::displayBalance(const Card& card) {
     // Verify card first
-    if (verifyCard(card) != VerifyStatus::OK)
+    if (verifyCard(card) != VerifyStatus::SUCCESS)
         throw std::logic_error("Invalid or blocked card");
 
     // Ensure the card belongs to a valid account
@@ -124,7 +128,7 @@ double ATM::displayBalance(const Card& card) {
 // Dispense cash from the ATM and account
 ATM::WithdrawStatus ATM::withdrawCash(const Card& card, double amount) {
     VerifyStatus vStatus = verifyCard(card);
-    if (vStatus != VerifyStatus::OK)
+    if (vStatus != VerifyStatus::SUCCESS)
         return WithdrawStatus::INVALID_CARD;
 
     if (amount <= 0)
@@ -159,7 +163,7 @@ ATM::WithdrawStatus ATM::withdrawCash(const Card& card, double amount) {
    
 // Deposit cash to the account and ATM
 ATM::DepositStatus ATM::depositCash(const Card& card, double amount) {
-    if (verifyCard(card) != VerifyStatus::OK)
+    if (verifyCard(card) != VerifyStatus::SUCCESS)
         return DepositStatus::INVALID_CARD;
 
     if (amount <= 0)
@@ -190,7 +194,7 @@ ATM::TransferStatus ATM::transfer(const Card& sourceCard, std::uint64_t targetAc
         return TransferStatus::INVALID_AMOUNT;
 
     // verify source card
-    if (verifyCard(sourceCard) != VerifyStatus::OK)
+    if (verifyCard(sourceCard) != VerifyStatus::SUCCESS)
         return TransferStatus::INVALID_CARD;
 
     auto sourceAccount = bank.getAccountByID(sourceCard.getAccountID());
@@ -234,6 +238,14 @@ void ATM::addTransaction(const std::shared_ptr<Transaction>& transaction) {
 const std::vector<std::shared_ptr<Transaction>>& ATM::getTransactions() const {
     return transactions;
 }
+
+std::uint64_t ATM::getATMID() const { return atmID; }
+
+std::string ATM::getLocation() const { return location; }
+
+double ATM::getAvailableCash() const { return availableCash; }
+
+Bank& ATM::getBank() const { return bank; }
 
 void ATM::refillCash(double amount) {
     availableCash += amount;

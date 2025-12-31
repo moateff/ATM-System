@@ -32,6 +32,9 @@ void UI::run() {
             case ATMPage::Exit:       currentPage = ATMPage::InsertCard; break;
         }
     }
+
+    AnsiRenderer::clear();
+    AnsiRenderer::move(0, 0);
 }
 
 // Pages 
@@ -49,6 +52,13 @@ void UI::insertCardPage() {
         return; 
     }
 
+    // Validate card number
+    if (!atm->validateCardNumber(values[0])) {
+        showMessage("INVALID CARD NUMBER", Color::RED);
+        currentPage = ATMPage::InsertCard;
+        return;
+    }
+
     // Authenticate card
     std::shared_ptr<Card> cardPtr;
     auto status = atm->authenticateCard(values[0], values[1], cardPtr);
@@ -62,37 +72,37 @@ void UI::insertCardPage() {
             break;
 
         case ATM::AuthenticateStatus::CARD_EXPIRED:
-            showMessage("CARD EXPIRED", YELLOW);
+            showMessage("CARD EXPIRED", Color::YELLOW);
             currentPage = ATMPage::InsertCard;
             break;
 
         case ATM::AuthenticateStatus::CARD_BLOCKED:
-            showMessage("CARD BLOCKED", RED);
+            showMessage("CARD BLOCKED", Color::RED);
             currentPage = ATMPage::InsertCard;
             break;
 
         case ATM::AuthenticateStatus::INVALID_PIN:
             /*
             if (invalidPINcounter >= 3) {
-                showMessage("CARD BLOCKED TEMPORARILY", RED);
+                showMessage("CARD BLOCKED TEMPORARILY", Color::RED);
                 currentCard->blockCard();
             } else if (invalidPINcounter == 2) {
-                showMessage("INVALID PIN " + std::to_string(invalidPINcounter) + " TIMES", YELLOW);
+                showMessage("INVALID PIN " + std::to_string(invalidPINcounter) + " TIMES", Color::YELLOW);
             } else {
-                showMessage("INVALID PIN " + std::to_string(invalidPINcounter) + " TIMES", YELLOW);
+                showMessage("INVALID PIN " + std::to_string(invalidPINcounter) + " TIMES", Color::YELLOW);
             }
             */
-            showMessage("INVALID PIN", RED);
-            currentPage = ATMPage::InsertCard;
-            break;
-
-        case ATM::AuthenticateStatus::CARD_NOT_FOUND:
-            showMessage("CARD NOT FOUND", RED);
+            showMessage("INVALID PIN", Color::RED);
             currentPage = ATMPage::InsertCard;
             break;
 
         case ATM::AuthenticateStatus::INVALID_CARD:
-            showMessage("INVALID CARD", RED);
+            showMessage("INVALID CARD", Color::RED);
+            currentPage = ATMPage::InsertCard;
+            break;
+        
+        case ATM::AuthenticateStatus::CARD_NOT_FOUND:
+            showMessage("CARD NOT FOUND", Color::RED);
             currentPage = ATMPage::InsertCard;
             break;
     }
@@ -104,7 +114,7 @@ void UI::mainMenuPage() {
         "TRANSFER", "BALANCE ENQUIRY",
         "CHANGE PIN", "EXIT"
     };
-    Menu menu(10, 3, 40, 12, "ATM MENU", options, 3, 2);
+    Menu menu(x, y,  width, height, "ATM MENU", options, 3, 2);
     int choice = menu.show(keyboard);
 
     switch(choice) {
@@ -126,7 +136,7 @@ void UI::withdrawPage() {
     }
 
     if (values[0].empty()) { 
-        showMessage("ENTER AMOUNT", YELLOW);
+        showMessage("ENTER AMOUNT", Color::YELLOW);
         currentPage = ATMPage::Withdraw; 
         return; 
     }
@@ -136,10 +146,10 @@ void UI::withdrawPage() {
 
     switch(status) {
         case ATM::WithdrawStatus::SUCCESS: showMessage("WITHDRAWAL SUCCESS"); break;
-        case ATM::WithdrawStatus::INSUFFICIENT_ACCOUNT_BALANCE: showMessage("INSUFFICIENT BALANCE", RED); break;
-        case ATM::WithdrawStatus::INSUFFICIENT_ATM_CASH: showMessage("ATM OUT OF CASH", RED); break;
-        case ATM::WithdrawStatus::INVALID_AMOUNT: showMessage("INVALID AMOUNT", RED); break;
-        case ATM::WithdrawStatus::INVALID_CARD: showMessage("INVALID CARD", RED); break;
+        case ATM::WithdrawStatus::INSUFFICIENT_ACCOUNT_BALANCE: showMessage("INSUFFICIENT BALANCE", Color::RED); break;
+        case ATM::WithdrawStatus::INSUFFICIENT_ATM_CASH: showMessage("ATM OUT OF CASH", Color::RED); break;
+        case ATM::WithdrawStatus::INVALID_AMOUNT: showMessage("INVALID AMOUNT", Color::RED); break;
+        case ATM::WithdrawStatus::INVALID_CARD: showMessage("INVALID CARD", Color::RED); break;
     }
 
     currentPage = ATMPage::MainMenu;
@@ -154,7 +164,7 @@ void UI::depositPage() {
     }
 
     if (values[0].empty()) { 
-        showMessage("ENTER AMOUNT", YELLOW);
+        showMessage("ENTER AMOUNT", Color::YELLOW);
         currentPage = ATMPage::Deposit; 
         return; 
     }
@@ -164,8 +174,8 @@ void UI::depositPage() {
 
     switch(status) {
         case ATM::DepositStatus::SUCCESS: showMessage("DEPOSIT SUCCESS"); break;
-        case ATM::DepositStatus::INVALID_AMOUNT: showMessage("INVALID AMOUNT", RED); break;
-        case ATM::DepositStatus::INVALID_CARD: showMessage("INVALID CARD", RED); break;
+        case ATM::DepositStatus::INVALID_AMOUNT: showMessage("INVALID AMOUNT", Color::RED); break;
+        case ATM::DepositStatus::INVALID_CARD: showMessage("INVALID CARD", Color::RED); break;
     }
 
     currentPage = ATMPage::MainMenu;
@@ -180,13 +190,13 @@ void UI::transferPage() {
     }
 
     if (values[0].empty()) { 
-        showMessage("ENTER TARGET ACCOUNT", YELLOW);
+        showMessage("ENTER TARGET ACCOUNT", Color::YELLOW);
         currentPage = ATMPage::Transfer; 
         return; 
     }
 
     if (values[1].empty()) { 
-        showMessage("ENTER AMOUNT", YELLOW);
+        showMessage("ENTER AMOUNT", Color::YELLOW);
         currentPage = ATMPage::Transfer; 
         return; 
     }
@@ -198,12 +208,12 @@ void UI::transferPage() {
 
     switch(status) {
         case ATM::TransferStatus::SUCCESS: showMessage("TRANSFER SUCCESS"); break;
-        case ATM::TransferStatus::INVALID_AMOUNT: showMessage("INVALID AMOUNT", RED); break;
-        case ATM::TransferStatus::INVALID_CARD: showMessage("INVALID CARD", RED); break;
-        case ATM::TransferStatus::SAME_ACCOUNT: showMessage("CANNOT TRANSFER TO SAME ACCOUNT", YELLOW); break;
-        case ATM::TransferStatus::SOURCE_ACCOUNT_NOT_FOUND: showMessage("SOURCE ACCOUNT NOT FOUND", RED); break;
-        case ATM::TransferStatus::TARGET_ACCOUNT_NOT_FOUND: showMessage("TARGET ACCOUNT NOT FOUND", RED); break;
-        case ATM::TransferStatus::INSUFFICIENT_BALANCE: showMessage("INSUFFICIENT BALANCE", RED); break;
+        case ATM::TransferStatus::INVALID_AMOUNT: showMessage("INVALID AMOUNT", Color::RED); break;
+        case ATM::TransferStatus::INVALID_CARD: showMessage("INVALID CARD", Color::RED); break;
+        case ATM::TransferStatus::SAME_ACCOUNT: showMessage("CANNOT TRANSFER TO SAME ACCOUNT", Color::YELLOW); break;
+        case ATM::TransferStatus::SOURCE_ACCOUNT_NOT_FOUND: showMessage("SOURCE ACCOUNT NOT FOUND", Color::RED); break;
+        case ATM::TransferStatus::TARGET_ACCOUNT_NOT_FOUND: showMessage("TARGET ACCOUNT NOT FOUND", Color::RED); break;
+        case ATM::TransferStatus::INSUFFICIENT_BALANCE: showMessage("INSUFFICIENT BALANCE", Color::RED); break;
     }
 
     currentPage = ATMPage::MainMenu;
@@ -218,13 +228,13 @@ void UI::changePinPage() {
     }
 
     if (values[0].empty()) { 
-        showMessage("ENTER OLD PIN", YELLOW);
+        showMessage("ENTER OLD PIN", Color::YELLOW);
         currentPage = ATMPage::ChangePIN; 
         return; 
     }
 
     if (values[1].empty()) { 
-        showMessage("ENTER NEW PIN", YELLOW);
+        showMessage("ENTER NEW PIN", Color::YELLOW);
         currentPage = ATMPage::ChangePIN; 
         return; 
     }
@@ -236,10 +246,10 @@ void UI::changePinPage() {
 
     switch(status) {
         case ATM::ChangePinStatus::SUCCESS: showMessage("PIN CHANGED"); break;
-        case ATM::ChangePinStatus::INVALID_CARD: showMessage("INVALID CARD", RED); break;
-        case ATM::ChangePinStatus::INVALID_OLD_PIN: showMessage("INVALID OLD PIN", RED); break;
-        case ATM::ChangePinStatus::CARD_BLOCKED: showMessage("CARD BLOCKED", RED); break;
-        case ATM::ChangePinStatus::CARD_EXPIRED: showMessage("CARD EXPIRED", YELLOW); break;
+        case ATM::ChangePinStatus::INVALID_CARD: showMessage("INVALID CARD", Color::RED); break;
+        case ATM::ChangePinStatus::INVALID_OLD_PIN: showMessage("INVALID OLD PIN", Color::RED); break;
+        case ATM::ChangePinStatus::CARD_BLOCKED: showMessage("CARD BLOCKED", Color::RED); break;
+        case ATM::ChangePinStatus::CARD_EXPIRED: showMessage("CARD EXPIRED", Color::YELLOW); break;
     }
 
     currentPage = ATMPage::MainMenu;
@@ -276,17 +286,16 @@ void UI::balancePage() {
 }
 
 // Utils
-void UI::showMessage(const std::string& message, int color, int durationSeconds) {
+void UI::showMessage(const std::string& message, Color color, int durationSeconds) {
     AnsiRenderer::clear();
     AnsiRenderer::hideCursor();
 
-    if (color == RED)         std::cout << "\033[41;97m"; // red background
-    else if (color == YELLOW) std::cout << "\033[30;103m"; // yellow background
-    else                      std::cout << "\033[42;97m"; // green background
+    if (color == Color::RED) std::cout << "\033[41;97m"; // red background
+    else if (color == Color::YELLOW) std::cout << "\033[30;103m"; // yellow background
+    else std::cout << "\033[42;97m"; // green background
 
-    int w = 40, h = 12, x = 10, y = 3;
-    AnsiRenderer::drawBox(x, y, w, h);
-    AnsiRenderer::drawText(x + (w - message.size())/2, y + (h-1)/2, message);
+    AnsiRenderer::drawBox(x, y, width, height);
+    AnsiRenderer::drawText(x + (width - message.size())/2, y + (height - 1)/2, message);
 
     std::cout << "\033[0m" << std::flush;
     sleep(durationSeconds);
@@ -299,8 +308,8 @@ std::vector<std::string> UI::insertCardForm() {
     AnsiRenderer::clear();
 
     Form form(
-        10, 3,                     // x, y
-        40, 12,                    // width, height
+        x, y,                  
+        width, height,            
         "INSERT CARD",             // header
         "Press ENTER to continue"  // footer
     );
@@ -338,8 +347,8 @@ std::vector<std::string> UI::changePinForm() {
     AnsiRenderer::clear();
 
     Form form(
-        10, 3,               // x, y
-        40, 12,              // width, height
+        x, y,                
+        width, height,       
         "CHANGE PIN",        // header
         "ENTER TO CONFIRM   ESC TO CANCEL" //  footer
     );
@@ -373,8 +382,8 @@ std::vector<std::string> UI::withdrawForm() {
     AnsiRenderer::clear();
 
     Form form(
-        10, 3,                     // x, y
-        40, 12,                    // width, height
+        x, y,                      
+        width, height,             
         "WITHDRAW CASH",           // header
         "Press ENTER to continue"  // footer
     );
@@ -397,8 +406,8 @@ std::vector<std::string> UI::depositForm() {
     AnsiRenderer::clear();
 
     Form form(
-        10, 3,                     // x, y
-        40, 12,                    // width, height
+        x, y,                      
+        width, height,             
         "DEPOSIT CASH",            // header
         "Press ENTER to continue"  // footer
     );
@@ -421,8 +430,8 @@ std::vector<std::string> UI::transferForm() {
     AnsiRenderer::clear();
 
     Form form(
-        10, 3,                     // x, y
-        40, 12,                    // width, height
+        x, y,                      
+        width, height,             
         "TRANSFER FUNDS",           // header
         "Press ENTER to continue"   // footer
     );

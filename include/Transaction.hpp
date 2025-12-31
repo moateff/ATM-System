@@ -26,21 +26,21 @@ private:
     const std::uint64_t accountID;
     const std::chrono::system_clock::time_point timestamp;
     const Type type;
-    const Status state;
+    const Status status;
     const double amount;
 
 public:
     Transaction(std::uint64_t accountID,
                 Type type,
                 double amount,
-                Status state);
+                Status status);
 
     std::uint64_t getTransactionID() const;
     std::uint64_t getAccountID() const;
-    Type getType() const;
-    double getAmount() const;
-    Status getStatus() const;
     std::chrono::system_clock::time_point getTimestamp() const;
+    Type getType() const;
+    Status getStatus() const;
+    double getAmount() const;
 
     std::string toString() const;
 };

@@ -15,7 +15,7 @@ class Bank; // forward declaration to avoid circular include
 class ATM {
 public:
     enum class VerifyStatus {
-        OK,
+        SUCCESS,
         CARD_EXPIRED,
         CARD_BLOCKED,
         INVALID_CARD
@@ -76,7 +76,8 @@ public:
     ATM(Bank& bank,
         const std::string& location, 
         double initialCash = 0.0);
-
+    
+    bool validateCardNumber(std::string cardNumber);
     AuthenticateStatus authenticateCard(const std::string& cardNumber, 
         const std::string& pin, std::shared_ptr<Card>& authenticatedCard) const;
     VerifyStatus verifyCard(const Card& card) const;
@@ -89,9 +90,10 @@ public:
     void addTransaction(const std::shared_ptr<Transaction>& transaction);
     const std::vector<std::shared_ptr<Transaction>>& getTransactions() const;
 
-    std::uint64_t getATMID() const { return atmID; }
-    std::string getLocation() const { return location; }
-    double getAvailableCash() const { return availableCash; }
+    std::uint64_t getATMID() const;
+    std::string getLocation() const;
+    double getAvailableCash() const;
+    Bank& getBank() const;
 
     void refillCash(double amount);
 

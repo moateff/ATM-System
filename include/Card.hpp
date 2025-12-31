@@ -59,10 +59,11 @@ public:
          const std::string& pin,
          std::uint64_t accountID);
 
-    uint64_t getAccountID() const;
-    const year_month& getExpirationDate() const;
-    Status getState() const;
     const std::string& getCardNumber() const;
+    const year_month& getExpirationDate() const;
+    const std::string& getCardHolderName() const;
+    const std::string& getBankName() const;
+    uint64_t getAccountID() const;
     Status getStatus() const;
 
     bool isExpired() const;

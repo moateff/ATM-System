@@ -2,6 +2,7 @@
 │        INSERT CARD           │
 │                              │
 │ Card Number: [              ]│
+|                              |
 │ PIN:         [              ]│
 │                              │
 │ Press ENTER to continue      │
@@ -14,18 +15,15 @@
 │  TRANSFER   [BALANCE ENQUIRY]│
 │    EXIT        CHANGE PIN    │
 │                              │
-│ Use arrow keys to navigate,  │
 │ ENTER to select              │
 └──────────────────────────────┘
 
-┌──────────────────────────────────────┐
-│              DEPOSIT                 │
-│                                      │
-│   ENTER AMOUNT:                      │
-│                                      │
-│   [          1000          ]         │
-│                                      │
-│   ENTER = CONFIRM   ESC = CANCEL     │
-└──────────────────────────────────────┘
-
-1234123412341234
+┌──────────────────────────────┐
+│           DEPOSIT            │
+│                              │
+│   ENTER AMOUNT:              │
+│                              │
+│   [     1000       ]         │
+│                              │
+│       ENTER = CONFIRM        │
+└──────────────────────────────┘

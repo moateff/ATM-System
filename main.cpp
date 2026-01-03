@@ -6,6 +6,10 @@
 #include "ATM.hpp"
 #include "UI.hpp"
 
+// accounts: [acc1, acc2]
+// acc1 cards: [validCard1, invalidCard1]
+// acc2 cards: [validCard2, expiredCard3]
+
 int main() {
     auto bank = std::make_shared<Bank>("Al-Ahly Bank");
 
